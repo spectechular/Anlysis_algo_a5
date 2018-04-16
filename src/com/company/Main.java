@@ -1,6 +1,7 @@
 package com.company;
 
 import javafx.scene.layout.GridPane;
+import org.omg.CORBA.INTERNAL;
 
 import java.lang.reflect.Array;
 
@@ -11,6 +12,7 @@ import java.lang.reflect.Array;
  * This program demonstrates depth first search and breadth first search graph algorithms
  */
 
+import java.net.Inet4Address;
 import java.util.*;
 
 public class Main {
@@ -19,7 +21,6 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //Two separate sets of "Graphs" so they can be manipulated by the separate algorithms
         Graph graph = new Graph();
 
 
@@ -38,7 +39,7 @@ public class Main {
         //Draw edges on graphs
         graph.initializeEdges();
 
-
+        //
         dspAlgo(graph);
 
 
@@ -64,17 +65,16 @@ public class Main {
             toBeChecked.add(i);
         }
 
-        while(!toBeChecked.isEmpty()){
+        while (!toBeChecked.isEmpty()) {
 
             int v = getNextToBeChecked(toBeChecked, currentDistance);
-            System.out.println(v);
             toBeChecked.remove(Integer.valueOf(v));
 
             for (int i = 0; i < NUM_NODES; i++) {
 
-                if(graph.graphNodes[v].adjacentNodes[i] != 0){
+                if (graph.graphNodes[v].adjacentNodes[i] != 0) {
 
-                    if (currentDistance[i] > currentDistance[v] + graph.graphNodes[v].adjacentNodes[i]){
+                    if (currentDistance[i] > currentDistance[v] + graph.graphNodes[v].adjacentNodes[i]) {
 
                         currentDistance[i] = currentDistance[v] + graph.graphNodes[v].adjacentNodes[i];
                         predecessor[i] = v;
@@ -88,82 +88,64 @@ public class Main {
         }
 
         for (int i = 0; i < NUM_NODES; i++) {
-            System.out.println("predecessor " + predecessor[i] + "\tDistance " + currentDistance[i]);
+            int identifierStringASCII = 65 + i;
+            int pLetterIdentifierASCII = 65 + predecessor[i];
+            int nodeDistance = currentDistance[i];
+            String letter = Character.toString((char) identifierStringASCII);
+            String predecessorLetter = Character.toString((char) pLetterIdentifierASCII);
+
+            if (nodeDistance == 999 || nodeDistance == 0) {
+                System.out.println(letter + ": predecessor " + "None" + "\tDistance " + "None");
+
+            } else {
+                System.out.println(letter + ": predecessor " + predecessorLetter + "\tDistance " + currentDistance[i] + printPath(graph, predecessor, currentDistance, i));
+            }
+
+
         }
     }
 
-    public static int getNextToBeChecked(ArrayList toBeChecked, int[] currentDistance){
+    public static String printPath(Graph graph, int[] predecessor, int[] currentDistance, int i) {
+        ArrayList<Integer> arrayListPath = new <Integer>ArrayList();
+        String path = "\t\t";
+        arrayListPath.add(i);
+        getPrevious(predecessor, arrayListPath, currentDistance, i);
+        for (int j = arrayListPath.size() - 1; j >= 0; j--) {
+            path += graph.graphNodes[arrayListPath.get(j)].letter;
+            if (j != 0) {
+                path += " --> ";
+
+            }
+        }
+
+        return path;
+    }
+
+    public static void getPrevious(int[] predecessor, ArrayList<Integer> arrayListPath, int[] currentDistance, int i) {
+
+        if (currentDistance[i] == 0 || currentDistance[i] == 999) {
+            return;
+        }
+
+        arrayListPath.add(predecessor[i]);
+        getPrevious(predecessor, arrayListPath, currentDistance, predecessor[i]);
+
+    }
+
+    public static int getNextToBeChecked(ArrayList toBeChecked, int[] currentDistance) {
 
         int v = 1000;
 
-            for (int i = 0; i < toBeChecked.size() ; i++) {
+        for (int i = 0; i < toBeChecked.size(); i++) {
 
-                if (currentDistance[(Integer)toBeChecked.get(i)] < v){
-                    v = (Integer)toBeChecked.get(i);
-                }
+            if (currentDistance[(Integer) toBeChecked.get(i)] < v) {
+                v = (Integer) toBeChecked.get(i);
             }
+        }
         return v;
     }
 
-   /* // A, E, F, B, C, G, I, J, H, D
-    public static void depthFirstSearch(Graph graph) {
 
-        for (int i = 0; i < NUM_NODES; i++) {
-            if (graph.graphNodes[i].visited == false) {
-                //Start recursion
-                DFS(i, graph);
-            }
-        }
-    }
-
-    static void DFS(int v, Graph graph) {
-        graph.graphNodes[v].visited = true;
-        System.out.println("Depth First Search Visited: " + graph.graphNodes[v].letter);
-        for (int i = 0; i < NUM_NODES; i++) {
-            //Checks is current node has adjacent node and if that has  been visited yet
-            if (graph.graphNodes[v].adjacentNodes[i] == true && graph.graphNodes[i].visited == false) {
-                DFS(i, graph);
-            }
-        }
-    }
-
-
-    public static void breadthFirstSearch(Graph graph) {
-        // A, E, H, F, I, B, C, G, J, D
-
-        //Created Queue. Built in! Woo!
-        Queue<Integer> queue = new LinkedList<>();
-
-        //Iterated through all nodes and if they have not been visited take appropriate action
-        for (int i = 0; i < NUM_NODES; i++) {
-            if (graph.graphNodes[i].visited == false) {
-                graph.graphNodes[i].visited = true;
-                System.out.println("Breadth First Search Visited: " + graph.graphNodes[i].letter);
-
-                //Visited node so add to queue
-                queue.add(i);
-
-                //Loop to check if the queue has something in it. If so do the following loop
-                while (queue.peek() != null) {
-
-                    //Grab from queue node to check adjacency
-                    int j = queue.remove();
-                    //Checks through all adjacent possibilities
-                    for (int k = 0; k < NUM_NODES; k++) {
-
-                        //Checks is node adjacent has not been visited. If it has not we visit it
-                        if (graph.graphNodes[j].adjacentNodes[k] == true && graph.graphNodes[k].visited == false) {
-                            graph.graphNodes[k].visited = true;
-                            System.out.println("Breadth First Search Visited: " + graph.graphNodes[k].letter);
-                            queue.add(k);
-                        }
-                    }
-                }
-            }
-        }
-        //Print line breaks for visibility in console
-        System.out.println("\n\n");
-    }*/
 }
 
 class Graph {
